@@ -1,0 +1,4 @@
+# Pinned so every group member (and the Docker image) runs the same versions.
+# The report must state software versions - these are them.
+mysql-connector-python==26.10.0   # official MySQL driver from Oracle
+redis==8.1.0                      # official Redis client (redis-py)

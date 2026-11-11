@@ -1,0 +1,19 @@
+# =============================================================================
+# schema.redis - how every MySQL table is stored in Redis
+# =============================================================================
+# Redis has no CREATE TABLE. A "schema" in Redis is two things:
+#   1. a KEY NAMING CONVENTION (which key holds which row, and as what type)
+#   2. a few DECLARATIONS made up front (search index, time series)
+
+# -----------------------------------------------------------------------------
+# KEY id_category_price (category, price)  (MySQL: index on products)
+# -----------------------------------------------------------------------------
+#   A search index over every hash whose key starts with "product:".
+#     name      TEXT              -> full-text searchable
+#     category  TAG SORTABLE      -> exact-match filter: @category:{electronics}
+#     brand     TAG               -> exact-match filter: @brand:{Atlas}
+#     price     NUMERIC SORTABLE  -> range filter + sorting: @price:[50 300] SORTBY price
+#   Redis keeps this index up to date automatically on every HSET, just like
+#   MySQL keeps id_category_price up to date on every INSERT/UPDATE.
+
+FT.CREATE id:products ON HASH PREFIX 1 product: SCHEMA name TEXT category TAG SORTABLE brand TAG price NUMERIC SORTABLE
