@@ -16,12 +16,14 @@ king-of-kings-phase2/
 ├── redis/
 │   ├── schema.redis
 │   └── queries.redis
-└── app/
-    ├── config.py
-    ├── generate_data.py
-    ├── mysql_db.py
-    ├── redis_db.py
-    └── demo.py
+├── app/
+│   ├── config.py
+│   ├── generate_data.py
+│   ├── mysql_db.py
+│   ├── redis_db.py
+│   └── demo.py
+├── testfiles/              <- optional Redis smoke checks
+└── results/  
 ```
 ---
 
