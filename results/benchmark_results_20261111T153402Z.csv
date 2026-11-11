@@ -1,0 +1,13 @@
+record_type,run_id,recorded_at_utc,query,database,run_number,elapsed_seconds,result_count,average_seconds,median_seconds
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,1,2.609620,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,2,2.418602,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,3,2.442471,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,4,2.438430,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,5,2.647308,360,,
+summary,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,MySQL,,,360,2.511286,2.442471
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,1,1.194175,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,2,0.993806,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,3,1.060797,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,4,0.990045,360,,
+run,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,5,1.018441,360,,
+summary,20261111T153402Z,2026-11-11T15:34:02+00:00,daily_category_average,Redis,,,360,1.051453,1.018441

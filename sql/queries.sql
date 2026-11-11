@@ -1,5 +1,9 @@
 -- =============================================================================
 -- queries.sql - our two Phase 2 queries, MySQL side
+# RUN IT
+#   grep -v '^--' queries.sql | mysql -u root -p shop | docker exec -i king-of-kings-phase2_mysql_1 mysql -u root -p shop
+#   (For Windows) Get-Content sql/queries.sql | docker compose exec -T mysql mysql -uroot -prootpass --table shop
+
 -- =============================================================================
 
 USE shop;
@@ -70,7 +74,6 @@ SELECT p.category,
 
 -- =============================================================================
 -- QUERY 2b - CHEAPEST 20 PRODUCTS IN A CATEGORY AND PRICE BAND
--- CHEAPEST 20 IN A CATEGORY AND PRICE BAND
 -- =============================================================================
 
 SELECT id, name, brand, price

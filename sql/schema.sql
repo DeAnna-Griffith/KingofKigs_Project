@@ -22,7 +22,7 @@ CREATE TABLE products (
   id        INT            NOT NULL,
   name      VARCHAR(120)   NOT NULL,
   category  VARCHAR(40)    NOT NULL, -- electronics, fashion, furniture, home, health, auto
-  price     DECIMAL(10,2)  NOT NULL, -- DECIMAL | Money must be exact
+  price     DECIMAL(10,2)  NOT NULL, -- DECIMAL: money must be exact
   brand     VARCHAR(60)    NOT NULL,
   stock     INT            NOT NULL,
   PRIMARY KEY (id),

@@ -106,7 +106,7 @@ def build_products(rng, n_products):
         if new_id in PINNED_PRODUCTS:
             name, category, price, brand, stock = PINNED_PRODUCTS[new_id]
         else:
-            noun, category, base_price, _source = rng.choice(NOUNS)
+            noun, category, base_price, _ = rng.choice(NOUNS)
             brand = rng.choice(BRANDS)
             name = f"{brand} {rng.choice(STYLES)} {noun}"
             price = max(1.00, round(base_price * rng.uniform(0.6, 1.6), 2))
@@ -119,20 +119,19 @@ def build_products(rng, n_products):
 
 
 def build_price_history(rng, products):
-    """Return a list of (product_id, time, price) tuples for the last 60 days."""
+    """Yield (product_id, time, price) tuples in product/time order."""
     days = [config.DATASET_LAST_DAY - timedelta(days=d) for d in range(config.HISTORY_DAYS)]
-    rows = []
     for p in products:
         current = float(p["price"])
         price = current
+        product_rows = []
         for day in days:   # newest -> oldest
             stamp = datetime(day.year, day.month, day.day, 12, 0, 0)
-            rows.append((p["id"], stamp.strftime(DT_FORMAT), f"{price:.2f}"))
+            product_rows.append((p["id"], stamp.strftime(DT_FORMAT), f"{price:.2f}"))
             # next (older) day's price: small random step, kept within +/-50%
             price = min(current * 1.5, max(current * 0.5, price * (1 + rng.gauss(0, 0.02))))
             price = max(0.50, round(price, 2))
-    rows.sort(key=lambda r: (r[0], r[1]))   # product, then oldest -> newest
-    return rows
+        yield from reversed(product_rows)   # product, then oldest -> newest
 
 
 def build_orders(rng, products, n_orders, n_users):
@@ -197,7 +196,7 @@ def main():
     print("Generating dataset ...")
 
     products = build_products(rng, args.products)
-    columns = dict((table, cols) for table, _f, cols in config.TABLES)
+    columns = dict((table, cols) for table, _, cols in config.TABLES)
     write_csv("products.csv", columns["products"],
               [(p["id"], p["name"], p["category"], p["price"], p["brand"], p["stock"]) for p in products])
     write_csv("price_history.csv", columns["price_history"], build_price_history(rng, products))

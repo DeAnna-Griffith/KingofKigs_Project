@@ -1,0 +1,46 @@
+# =============================================================================
+# queries.redis - our two Phase 2 queries, Redis side
+# =============================================================================
+# RUN IT
+#   grep -v '^#' redis/queries.redis | docker compose exec -T redis redis-cli
+#   (For Windows) Get-Content redis/queries.redis | Select-String -Pattern '^#' -NotMatch | ForEach-Object { $_.Line } | docker compose exec -T redis redis-cli
+# =============================================================================
+
+
+# =============================================================================
+# QUERY 1 - FLASH SALE | BUY ONE UNIT OF A PRODUCT AT A SPECIAL PRICE
+# =============================================================================
+
+# 1.0  Reset, so the query behaves the same every run.
+SET stock:213 350
+
+# 1.1  Open a 60-second sale on product 213 (value = the sale price).
+SET flashsale:213 199.99 EX 60
+
+# 1.2  Is the sale live, and how long is left?
+GET flashsale:213
+TTL flashsale:213
+
+# 1.3 The purchase must be atomic: separate commands could oversell or record
+#     a purchase after the sale expires. The Lua script checks expiry and stock
+#     together, then decrements stock only when the purchase is valid.
+EVAL "if redis.call('EXISTS', KEYS[1]) == 0 then return -1 end local left = redis.call('DECRBY', KEYS[2], ARGV[1]) if left < 0 then redis.call('INCRBY', KEYS[2], ARGV[1]) return -2 end redis.call('XADD', KEYS[3], '*', 'user_id', ARGV[2], 'product_id', ARGV[3], 'qty', ARGV[1]) return left" 3 flashsale:213 stock:213 orders 1 42 213
+
+# 1.4  Simulate the window closing
+EXPIRE flashsale:213 0
+GET flashsale:213
+EVAL "if redis.call('EXISTS', KEYS[1]) == 0 then return -1 end local left = redis.call('DECRBY', KEYS[2], ARGV[1]) if left < 0 then redis.call('INCRBY', KEYS[2], ARGV[1]) return -2 end redis.call('XADD', KEYS[3], '*', 'user_id', ARGV[2], 'product_id', ARGV[3], 'qty', ARGV[1]) return left" 3 flashsale:213 stock:213 orders 1 42 213
+GET stock:213
+
+
+# =============================================================================
+# QUERY 2 - AVERAGE PRICE PER CATEGORY PER DAY OVER 60 DAYS
+# =============================================================================
+
+TS.MRANGE 1789171200000 1794355199999 AGGREGATION avg 86400000 FILTER kind=price GROUPBY category REDUCE avg
+
+# =============================================================================
+# QUERY 2b - CHEAPEST 20 IN A CATEGORY AND PRICE BAND
+# =============================================================================
+
+FT.SEARCH id:products "@category:{electronics} @price:[50 300]" RETURN 3 name brand price SORTBY price ASC LIMIT 0 20

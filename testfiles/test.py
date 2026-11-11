@@ -1,25 +1,22 @@
-import redis
-import json
-import time
+"""Small Redis connection and string round-trip smoke check."""
 
-import redis
+from app.redis_db import get_connection
 
-# Instantiate a Redis client, connecting to localhost on port 6379
-r = redis.Redis(
-    host='Redis',
-    port=6379,
-    db=0  # The default Redis database index
-)
 
-# 1. SET command: store a string under 'mykey'
-r.set("mykey", "hello from Windows")
+def main():
+    connection = get_connection()
+    key = "test:connection-smoke"
+    expected = "hello from King of Kings"
+    try:
+        connection.set(key, expected)
+        actual = connection.get(key)
+        if actual != expected:
+            raise AssertionError(f"Expected {expected!r}, got {actual!r}")
+        print("Redis connection and string round-trip succeeded.")
+    finally:
+        connection.delete(key)
+        connection.close()
 
-# 2. GET command: retrieve the value stored at 'mykey'
-value = r.get("id")
-print(value)   # Output is b'hello from Windows', since redis-py returns bytes.
 
-# 3. Convert bytes to string
-print(value.decode())  # prints "hello from Windows"
-
-# 4. DEL command: remove 'mykey' from Redis
-r.delete("mykey")
+if __name__ == "__main__":
+    main()

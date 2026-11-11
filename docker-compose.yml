@@ -1,0 +1,56 @@
+# =============================================================================
+# docker-compose.yml - everything the project needs, in three containers
+# =============================================================================
+# Start the databases:  docker compose up -d
+# Stop them:            docker compose down          (keeps MySQL's data)
+# Wipe everything:      docker compose down -v       (deletes MySQL's data too)
+# =============================================================================
+
+name: kingofkings
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: shop
+    ports:
+      - "3307:3306"
+    volumes:
+      # Every .sql file in this folder runs once, when the data volume is empty.
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:8.2
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build: .   # uses ./Dockerfile
+    profiles: ["app"]
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      REDIS_HOST: redis
+    volumes:
+      - ./:/project
+    working_dir: /project
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

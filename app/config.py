@@ -15,7 +15,7 @@ REDIS_DIR = PROJECT_ROOT / "redis"        # schema.redis + queries.redis
 
 MYSQL = {
     "host": os.getenv("MYSQL_HOST", "127.0.0.1"),
-    "port": int(os.getenv("MYSQL_PORT", "3306")),
+    "port": int(os.getenv("MYSQL_PORT", "3307")),
     "user": os.getenv("MYSQL_USER", "root"),
     "password": os.getenv("MYSQL_PASSWORD", "rootpass"),
     "database": os.getenv("MYSQL_DATABASE", "shop"),
