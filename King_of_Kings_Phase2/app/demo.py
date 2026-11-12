@@ -14,8 +14,8 @@ import time
 from datetime import datetime, time as datetime_time, timedelta, timezone
 from pathlib import Path
 
-from app import config
-from app.mysql_db import (
+import config
+from mysql_db import (
     get_connection as get_mysql_connection,
     read_sql_statements,
 )
